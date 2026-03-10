@@ -92,7 +92,7 @@ def _build_llm_context(soup: BeautifulSoup) -> str:
 
 def _extract_via_llm(page_context: str, page_url: str) -> str | None:
     """Use Gemini to extract the price from focused page text."""
-    client = genai.Client(api_key="AIzaSyAo9UcVWaUQSQIOPFqA0UZHSZiDstT3nZY")
+    client = genai.Client(api_key="")
 
     prompt = (
         "You are a price extraction assistant. The page may be in any language including Hebrew. "
