@@ -108,6 +108,7 @@ def _extract_price_from_selectors(soup: BeautifulSoup) -> Decimal | None:
     """Extract price from common CSS selectors."""
     selectors = [
         ".price",
+        ".price_color",
         "[data-price]",
         "#priceblock_ourprice",
         ".a-price-whole",
