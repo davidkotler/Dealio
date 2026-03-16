@@ -100,7 +100,9 @@
       "Bash(npx --yes @stoplight/spectral-cli lint services/gateway/specs/openapi/v1.yaml 2>&1)",
       "Bash(npx --yes @stoplight/spectral-cli lint services/gateway/specs/openapi/v1.yaml -r \"https://unpkg.com/@stoplight/spectral-rulesets/dist/oas.mjs\" 2>&1)",
       "Bash(for f:*)",
-      "Read(//private/tmp/claude-501/-Users-barbuskila-Desktop-Projects-tessera/tasks/**)"
+      "Read(//private/tmp/claude-501/-Users-barbuskila-Desktop-Projects-tessera/tasks/**)",
+      "Write(C:\\work_projects\\Dealio\\docs\\**)",
+      "Write(C:\\work_projects\\Dealio\\services\\**)"
     ]
   }
 }

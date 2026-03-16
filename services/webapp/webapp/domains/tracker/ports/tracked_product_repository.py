@@ -1,0 +1,14 @@
+from __future__ import annotations
+
+from typing import Protocol, runtime_checkable
+
+from webapp.domains.identity.models.domain import UserId
+from webapp.domains.tracker.models.domain import TrackedProduct, TrackedProductId
+
+
+@runtime_checkable
+class TrackedProductRepository(Protocol):
+    async def get_by_id(self, product_id: TrackedProductId) -> TrackedProduct | None: ...
+    async def list_by_user_id(self, user_id: UserId) -> list[TrackedProduct]: ...
+    async def save(self, product: TrackedProduct) -> None: ...
+    async def delete(self, product_id: TrackedProductId) -> None: ...

@@ -1,0 +1,12 @@
+from __future__ import annotations
+
+from typing import Protocol, runtime_checkable
+
+from webapp.domains.identity.models.domain import User, UserId
+
+
+@runtime_checkable
+class UserRepository(Protocol):
+    async def get_by_id(self, user_id: UserId) -> User | None: ...
+    async def get_by_email(self, email: str) -> User | None: ...
+    async def save(self, user: User) -> None: ...
