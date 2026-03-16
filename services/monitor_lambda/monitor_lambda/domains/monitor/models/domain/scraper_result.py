@@ -24,6 +24,7 @@ class ScraperFailure:
     error_type: ScraperErrorType
     message: str
     status_code: int | None
+    retry_count: int = 0
 
 
 ScraperResult = ScraperSuccess | ScraperFailure

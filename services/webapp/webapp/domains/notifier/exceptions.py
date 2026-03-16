@@ -7,3 +7,7 @@ class NotifierError(Exception):
 
 class NotificationNotFoundError(NotifierError):
     """Raised when a notification cannot be found."""
+
+
+class InvalidCursorError(NotifierError):
+    """Raised when a pagination cursor cannot be decoded."""

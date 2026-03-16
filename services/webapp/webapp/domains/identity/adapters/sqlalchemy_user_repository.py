@@ -31,6 +31,13 @@ class SQLAlchemyUserRepository:
         record = result.scalar_one_or_none()
         return _to_domain(record) if record is not None else None
 
+    async def get_by_google_sub(self, sub: str) -> User | None:
+        result = await self._session.execute(
+            select(UserRecord).where(UserRecord.google_sub == sub)
+        )
+        record = result.scalar_one_or_none()
+        return _to_domain(record) if record is not None else None
+
     async def save(self, user: User) -> None:
         values = _to_record(user)
         stmt = (

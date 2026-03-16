@@ -10,5 +10,16 @@ from monitor_lambda.domains.monitor.models.domain.tracked_product_summary import
 
 @runtime_checkable
 class TrackedProductRepository(Protocol):
-    async def list_all(self) -> list[TrackedProductSummary]: ...
-    async def update_price(self, product_id: TrackedProductId, new_price: Decimal, checked_at: datetime) -> None: ...
+    async def list_all_active(self) -> list[TrackedProductSummary]: ...
+    async def update_prices(
+        self,
+        product_id: TrackedProductId,
+        new_price: Decimal,
+        previous_price: Decimal,
+        last_checked_at: datetime,
+    ) -> None: ...
+    async def update_last_checked_at(
+        self,
+        product_id: TrackedProductId,
+        last_checked_at: datetime,
+    ) -> None: ...

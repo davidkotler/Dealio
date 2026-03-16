@@ -35,7 +35,12 @@ class ScraperLambdaClient:
             attempt += 1
             if attempt < self._max_retries:
                 await asyncio.sleep(2 ** (attempt - 1))  # 1s, 2s
-        return last_result  # type: ignore[return-value]
+        return ScraperFailure(  # type: ignore[union-attr]
+            error_type=last_result.error_type,
+            message=last_result.message,
+            status_code=last_result.status_code,
+            retry_count=attempt,
+        )
 
     async def _invoke(self, url: str) -> ScraperResult:
         try:
