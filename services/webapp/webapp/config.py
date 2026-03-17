@@ -2,16 +2,19 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Annotated
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+_ENV_FILE = Path(__file__).parent.parent / ".env"
+
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables or .env file."""
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="forbid")
+    model_config = SettingsConfigDict(env_file=_ENV_FILE, env_file_encoding="utf-8", extra="forbid")
 
     database_url: Annotated[str, Field(description="PostgreSQL async connection URL (asyncpg)")]
     jwt_secret: Annotated[str, Field(description="Secret key for signing JWT tokens")]
