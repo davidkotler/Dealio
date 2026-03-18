@@ -5,7 +5,6 @@ import boto3
 from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from webapp.config import Settings
 from webapp.dependencies import get_current_user, get_db_session, get_settings
 from webapp.domains.identity.adapters.authlib_google_oidc_client import AuthlibGoogleOIDCClient
@@ -36,6 +35,7 @@ from webapp.domains.identity.models.contracts.api.auth import (
 )
 from webapp.domains.identity.models.domain.user import User
 
+
 _COOKIE_NAME = "session"
 _COOKIE_MAX_AGE = 86400
 
@@ -62,6 +62,7 @@ async def register(
     session: AsyncSession = Depends(get_db_session),
     settings: Settings = Depends(get_settings),
 ) -> RegisterResponse:
+
     user, token = await RegisterUser(
         user_repo=SQLAlchemyUserRepository(session),
         jwt_secret=settings.jwt_secret,

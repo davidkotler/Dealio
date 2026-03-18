@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import CheckConstraint, ForeignKey, Numeric, String, Text, UniqueConstraint
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Numeric, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -33,5 +33,5 @@ class TrackedProductRecord(WebappBase):
     product_name: Mapped[str] = mapped_column(String(500), nullable=False)
     current_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     previous_price: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
-    last_checked_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    created_at: Mapped[datetime] = mapped_column(nullable=False, server_default="NOW()")
+    last_checked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default="NOW()")

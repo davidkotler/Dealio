@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 
-from passlib.hash import bcrypt as _bcrypt
+import bcrypt
+
+
+def _prepare(raw: str) -> bytes:
+    return hashlib.sha256(raw.encode()).hexdigest().encode()
 
 
 @dataclass(frozen=True)
@@ -11,7 +16,8 @@ class HashedPassword:
 
     @classmethod
     def create(cls, raw: str, cost: int = 14) -> "HashedPassword":
-        return cls(value=_bcrypt.using(rounds=cost).hash(raw))
+        hashed = bcrypt.hashpw(_prepare(raw), bcrypt.gensalt(rounds=cost))
+        return cls(value=hashed.decode())
 
     def verify(self, raw: str) -> bool:
-        return _bcrypt.verify(raw, self.value)
+        return bcrypt.checkpw(_prepare(raw), self.value.encode())

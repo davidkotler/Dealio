@@ -1,8 +1,12 @@
 """FastAPI application entry point."""
 from __future__ import annotations
-
+from uvicorn import run
+import logging
+import sys
 from contextlib import asynccontextmanager
+from typing import Any
 
+import structlog
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +16,8 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from webapp.config import get_settings
 from webapp.domains.identity.adapters.in_memory_token_store import InMemoryTokenStore
+import webapp.infrastructure.database  # noqa: F401 — registers all ORM models with WebappBase.metadata
+from webapp.infrastructure.database.base import WebappBase
 from webapp.domains.identity.exceptions import (
     EmailAlreadyRegisteredError,
     InvalidCredentialsError,
@@ -33,7 +39,53 @@ from webapp.domains.tracker.exceptions import (
 )
 from webapp.domains.tracker.routes.v1.notifications import router as notifications_router
 from webapp.domains.tracker.routes.v1.products import router as products_router
+from webapp.middleware import RequestLoggingMiddleware
 from webapp.models.contracts.api.errors import ErrorResponse
+
+
+
+logger = structlog.get_logger()
+
+
+def configure_logging() -> None:
+    use_json = False
+    log_level = "INFO"
+
+    shared: list[Any] = [
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso", utc=True),
+        structlog.processors.StackInfoRenderer(),
+    ]
+
+    renderer: Any = structlog.processors.JSONRenderer() if use_json else structlog.dev.ConsoleRenderer(colors=True)
+
+    structlog.configure(
+        processors=[
+            *shared,
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        ],
+        wrapper_class=structlog.make_filtering_bound_logger(log_level),
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        cache_logger_on_first_use=True,
+    )
+
+    formatter_processors: list[Any] = [structlog.stdlib.ProcessorFormatter.remove_processors_meta]
+    if use_json:
+        formatter_processors.append(structlog.processors.dict_tracebacks)
+    formatter_processors.append(renderer)
+
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setFormatter(
+        structlog.stdlib.ProcessorFormatter(
+            foreign_pre_chain=shared,
+            processors=formatter_processors,
+        )
+    )
+    root = logging.getLogger()
+    root.handlers.clear()
+    root.addHandler(handler)
+    root.setLevel(log_level)
 
 
 _DOMAIN_EXCEPTION_MAP: dict[type[Exception], tuple[int, str]] = {
@@ -58,6 +110,8 @@ _DOMAIN_EXCEPTION_MAP: dict[type[Exception], tuple[int, str]] = {
 async def lifespan(app: FastAPI):  # type: ignore[type-arg]
     settings = get_settings()
     engine = create_async_engine(settings.database_url)
+    async with engine.begin() as conn:
+        await conn.run_sync(WebappBase.metadata.create_all)
     app.state.session_factory = async_sessionmaker(engine, expire_on_commit=False)
     app.state.token_store = InMemoryTokenStore()
     yield
@@ -65,9 +119,11 @@ async def lifespan(app: FastAPI):  # type: ignore[type-arg]
 
 
 def create_app() -> FastAPI:
+    configure_logging()
     settings = get_settings()
     app = FastAPI(title="Dealio Webapp", version="1.0.0", lifespan=lifespan)
 
+    app.add_middleware(RequestLoggingMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[settings.app_base_url],
@@ -106,6 +162,13 @@ def create_app() -> FastAPI:
 
     @app.exception_handler(Exception)
     async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+        await logger.aexception(
+            "request.unhandled_exception",
+            http_method=request.method,
+            http_path=request.url.path,
+            error_type=type(exc).__name__,
+            error_code="INTERNAL_ERROR",
+        )
         return JSONResponse(
             status_code=500,
             content=ErrorResponse(detail="Internal server error", code="INTERNAL_ERROR").model_dump(),
@@ -125,3 +188,6 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+if __name__ == '__main__':
+    run("main:app",host="localhost",port=8001,reload=True)

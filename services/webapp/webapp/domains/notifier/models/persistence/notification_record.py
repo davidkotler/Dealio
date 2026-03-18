@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import CheckConstraint, ForeignKey, Numeric
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Numeric
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -33,5 +33,5 @@ class NotificationRecord(WebappBase):
     )
     old_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     new_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(nullable=False, server_default="NOW()")
-    read_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default="NOW()")
+    read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
