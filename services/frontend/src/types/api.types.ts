@@ -1,0 +1,19 @@
+export interface ErrorResponse {
+  detail: string
+  code: string
+}
+
+export type ApiErrorCode =
+  | 'EMAIL_ALREADY_REGISTERED'
+  | 'INVALID_CREDENTIALS'
+  | 'WEAK_PASSWORD'
+  | 'PASSWORD_CHANGE_NOT_ALLOWED'
+  | 'INVALID_RESET_TOKEN'
+  | 'INVALID_PRODUCT_URL'
+  | 'PRODUCT_LIMIT_EXCEEDED'
+  | 'DUPLICATE_PRODUCT'
+  | 'SCRAPING_FAILED'
+  | 'PRODUCT_NOT_FOUND'
+  | 'NOTIFICATION_NOT_FOUND'
+  | 'VALIDATION_ERROR'
+  | 'INTERNAL_ERROR'

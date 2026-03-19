@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:17.2
+    environment:
+      POSTGRES_USER: dealio
+      POSTGRES_PASSWORD: dealio
+      POSTGRES_DB: dealio
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dealio -d dealio"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres_data:
+
+networks:
+  db:
+    driver: bridge
+    internal: false
