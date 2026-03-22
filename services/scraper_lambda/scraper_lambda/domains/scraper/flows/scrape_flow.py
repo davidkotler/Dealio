@@ -1,34 +1,34 @@
 from __future__ import annotations
 
+from scraper_lambda.domains.scraper.exceptions import LLMExtractionError
 from scraper_lambda.domains.scraper.models.domain.scraper_result import (
     ScraperErrorType,
     ScraperFailure,
     ScraperResult,
     ScraperSuccess,
 )
-from scraper_lambda.domains.scraper.flows.classify_response import (
-    classify_response,
-)
+from scraper_lambda.domains.scraper.flows.classify_response import classify_response
 from scraper_lambda.domains.scraper.flows.extract_name import extract_name
 from scraper_lambda.domains.scraper.flows.extract_price import extract_price
 from scraper_lambda.domains.scraper.flows.fetch_page import fetch_page
+from scraper_lambda.domains.scraper.flows.preprocess_html import preprocess_html
+from scraper_lambda.domains.scraper.ports.llm_client import LLMClient
 
 
-async def scrape_flow(url: str) -> ScraperResult:
+async def scrape_flow(url: str, *, llm_client: LLMClient) -> ScraperResult:
     """
     Orchestrate the complete scraping flow for a product URL.
 
     Flow:
     1. Fetch the page from the URL
     2. Classify the response (ok, blocked, http_error)
-    3. Extract price from HTML
-    4. Extract product name from HTML
+    3. Preprocess HTML and attempt LLM extraction (price + name)
+    4. On LLM failure or missing fields, cascade to regex/CSS fallback
     5. Return success or failure result
-
-    Catches unexpected exceptions and returns ScraperFailure with PARSE_ERROR.
 
     Args:
         url: The product URL to scrape
+        llm_client: LLM client for structured product data extraction
 
     Returns:
         ScraperResult: Either ScraperSuccess with price and name, or ScraperFailure with error details
@@ -54,7 +54,18 @@ async def scrape_flow(url: str) -> ScraperResult:
                 status_code=result.status_code,
             )
 
-        # Step 3: Extract price
+        # Step 3: LLM extraction
+        cleaned = preprocess_html(result.text)
+        llm_result = None
+        try:
+            llm_result = await llm_client.extract_product_data(cleaned)
+        except LLMExtractionError:
+            pass
+
+        if llm_result is not None and llm_result.price is not None and llm_result.product_name is not None:
+            return ScraperSuccess(price=llm_result.price, product_name=llm_result.product_name)
+
+        # Step 4: Cascade fallback to regex/CSS extraction
         price = extract_price(result.text)
         if price is None:
             return ScraperFailure(
@@ -63,7 +74,6 @@ async def scrape_flow(url: str) -> ScraperResult:
                 status_code=None,
             )
 
-        # Step 4: Extract product name
         name = extract_name(result.text)
         if name is None:
             return ScraperFailure(
@@ -72,7 +82,6 @@ async def scrape_flow(url: str) -> ScraperResult:
                 status_code=None,
             )
 
-        # Step 5: Return success
         return ScraperSuccess(price=price, product_name=name)
 
     except Exception as e:

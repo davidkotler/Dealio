@@ -16,7 +16,12 @@ from webapp.domains.identity.models.domain.user import User
 
 async def get_db_session(request: Request) -> AsyncGenerator[AsyncSession, None]:
     async with request.app.state.session_factory() as session:
-        yield session
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
 
 
 def get_settings() -> Settings:

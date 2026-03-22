@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { LayoutDashboard, Bell, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useProducts } from '@/hooks/useProducts'
+import { useDashboard } from '@/hooks/useProducts'
 import { MAX_PRODUCTS } from '@/config/plans'
 
 const NAV_ITEMS = [
@@ -11,8 +11,8 @@ const NAV_ITEMS = [
 ] as const
 
 export function SideNav() {
-  const { data: products } = useProducts()
-  const usedCount = products?.length ?? 0
+  const { data } = useDashboard()
+  const usedCount = data?.products?.length ?? 0
 
   return (
     <nav

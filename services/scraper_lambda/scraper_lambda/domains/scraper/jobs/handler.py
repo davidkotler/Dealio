@@ -5,9 +5,22 @@ import asyncio
 from typing import Any
 
 from scraper_lambda.domains.scraper.flows.scrape_flow import scrape_flow
-from scraper_lambda.domains.scraper.models.domain.scraper_result import (
-    ScraperSuccess,
-)
+from scraper_lambda.domains.scraper.models.domain.scraper_result import ScraperSuccess
+from scraper_lambda.domains.scraper.ports.llm_client import LLMClient
+from scraper_lambda.infrastructure.settings import Settings
+
+
+def _build_llm_client(settings: Settings) -> LLMClient:
+    model = settings.llm_model
+    if settings.llm_provider == "openai":
+        from scraper_lambda.domains.scraper.adapters.openai_llm_client import OpenAILLMClient
+
+        return OpenAILLMClient(_api_key=settings.llm_api_key, _model=model or "gpt-4o-mini")
+    if settings.llm_provider == "gemini":
+        from scraper_lambda.domains.scraper.adapters.gemini_llm_client import GeminiLLMClient
+
+        return GeminiLLMClient(_api_key=settings.llm_api_key, _model=model or "gemini-2.0-flash")
+    raise ValueError(f"Unsupported LLM_PROVIDER: {settings.llm_provider!r}")
 
 
 def handler(event: dict[str, Any], context: object) -> dict[str, Any]:
@@ -20,7 +33,9 @@ def handler(event: dict[str, Any], context: object) -> dict[str, Any]:
             "message": "Missing url in event",
             "status_code": None,
         }
-    result = asyncio.run(scrape_flow(url))
+    settings = Settings()
+    llm_client = _build_llm_client(settings)
+    result = asyncio.run(scrape_flow(url, llm_client=llm_client))
     if isinstance(result, ScraperSuccess):
         return {
             "status": "success",

@@ -7,6 +7,7 @@ import { SignUpPage } from '@/pages/SignUpPage'
 import { LoginPage } from '@/pages/LoginPage'
 import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
+import { DashboardPage } from '@/pages/DashboardPage'
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
       </Route>
       <Route element={<PrivateRoute />}>
         <Route element={<AppShell />}>
-          <Route path="/dashboard" element={<div>Dashboard</div>} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/products/:id" element={<div>ProductDetail</div>} />
           <Route path="/notifications" element={<div>Notifications</div>} />
           <Route path="/settings" element={<div>Settings</div>} />
