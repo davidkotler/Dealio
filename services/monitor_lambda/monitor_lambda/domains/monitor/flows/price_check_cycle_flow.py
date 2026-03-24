@@ -37,6 +37,8 @@ class PriceCheckCycleFlow:
 
     async def run(self) -> None:
         products = await self.product_repo.list_all_active()
+        print("products:")
+        print(products)
         if not products:
             log.info("price_check_cycle.no_products")
             return

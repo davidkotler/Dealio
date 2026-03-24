@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 
 from webapp.domains.identity.models.domain.types import UserId
-from webapp.domains.scraper_client.models.domain.scraper_result import ScraperFailure
+from webapp.domains.scraper_client.models.domain.scraper_result import ScraperFailure, ScraperSuccess
 from webapp.domains.scraper_client.ports.scraper_port import ScraperPort
 from webapp.domains.tracker.exceptions import (
     DuplicateProductError,
@@ -41,7 +41,8 @@ class AddTrackedProduct:
                 f"User {user_id} is already tracking {url.value!r}."
             )
 
-        result = await self.scraper.scrape(url.value)
+        # result = await self.scraper.scrape(url.value)
+        result = ScraperSuccess(price=70.0, product_name="name test")
         if isinstance(result, ScraperFailure):
             raise ScrapingFailedError(
                 f"Scraping {url.value!r} failed: {result.message}"

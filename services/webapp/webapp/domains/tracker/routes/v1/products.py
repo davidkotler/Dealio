@@ -66,7 +66,7 @@ async def add_product(
 ) -> ProductResponse:
     product = await AddTrackedProduct(
         product_repo=SQLAlchemyTrackedProductRepository(session),
-        scraper=ScraperLambdaClient(lambda_name=settings.scraper_lambda_name),
+        scraper=ScraperLambdaClient(lambda_name=settings.scraper_lambda_name, region=settings.aws_region),
     ).execute(current_user.id, body.url)
     return _to_product_response(product)
 

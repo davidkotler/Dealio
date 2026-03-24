@@ -6,7 +6,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
-from monitor_lambda.domains.monitor.adapters.scraper_lambda_client import ScraperLambdaClient
+from monitor_lambda.domains.monitor.adapters.local_scraper_adapter import LocalScraperAdapter
 from monitor_lambda.domains.monitor.adapters.ses_email_sender import SESEmailSender
 from monitor_lambda.domains.monitor.adapters.sqlalchemy_notification_write_repository import (
     SQLAlchemyNotificationWriteRepository,
@@ -35,7 +35,14 @@ async def _async_handler() -> None:
             product_repo=SQLAlchemyTrackedProductRepository(session),
             price_check_log_repo=SQLAlchemyPriceCheckLogRepository(session),
             notification_repo=SQLAlchemyNotificationWriteRepository(session),
-            scraper=ScraperLambdaClient(lambda_name=settings.scraper_lambda_name),
-            email_sender=SESEmailSender(settings.ses_from_address),
+            scraper=LocalScraperAdapter(
+                _llm_provider=settings.llm_provider,
+                _llm_api_key=settings.llm_api_key,
+                _llm_model=settings.llm_model,
+            ),
+            email_sender=SESEmailSender(
+                _from_address=settings.ses_from_address,
+                _region=settings.aws_region,
+            ),
         )
         await flow.run()

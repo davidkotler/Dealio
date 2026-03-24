@@ -15,7 +15,11 @@ from monitor_lambda.domains.monitor.exceptions import EmailDeliveryError
 @dataclass
 class SESEmailSender:
     _from_address: str
-    _client: Any = field(default_factory=lambda: boto3.client("ses"))
+    _region: str = "us-east-1"
+    _client: Any = field(init=False)
+
+    def __post_init__(self) -> None:
+        self._client = boto3.client("ses", region_name=self._region)
 
     async def send_price_drop_alert(
         self,

@@ -4,22 +4,22 @@ from __future__ import annotations
 import asyncio
 from typing import Any
 
-from scraper_lambda.domains.scraper.flows.scrape_flow import scrape_flow
-from scraper_lambda.domains.scraper.models.domain.scraper_result import ScraperSuccess
-from scraper_lambda.domains.scraper.ports.llm_client import LLMClient
-from scraper_lambda.infrastructure.settings import Settings
+from monitor_lambda.domains.scraper.flows.scrape_flow import scrape_flow
+from monitor_lambda.domains.scraper.models.domain.scraper_result import ScraperSuccess
+from monitor_lambda.domains.scraper.ports.llm_client import LLMClient
+from monitor_lambda.infrastructure.settings import Settings
 
 
 def _build_llm_client(settings: Settings) -> LLMClient:
     model = settings.llm_model
     if settings.llm_provider == "openai":
-        from scraper_lambda.domains.scraper.adapters.openai_llm_client import OpenAILLMClient
+        from monitor_lambda.domains.scraper.adapters.openai_llm_client import OpenAILLMClient
 
         return OpenAILLMClient(_api_key=settings.llm_api_key, _model=model or "gpt-4o-mini")
     if settings.llm_provider == "gemini":
-        from scraper_lambda.domains.scraper.adapters.gemini_llm_client import GeminiLLMClient
+        from monitor_lambda.domains.scraper.adapters.gemini_llm_client import GeminiLLMClient
 
-        return GeminiLLMClient(_api_key=settings.llm_api_key, _model=model or "gemini-2.0-flash")
+        return GeminiLLMClient(_api_key=settings.llm_api_key, _model=model or "gemini-2.5-flash")
     raise ValueError(f"Unsupported LLM_PROVIDER: {settings.llm_provider!r}")
 
 

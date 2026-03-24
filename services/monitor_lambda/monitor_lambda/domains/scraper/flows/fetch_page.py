@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import httpx
 
-from scraper_lambda.domains.scraper.models.domain.scraper_result import (
+from monitor_lambda.domains.scraper.models.domain.scraper_result import (
     ScraperErrorType,
     ScraperFailure,
 )

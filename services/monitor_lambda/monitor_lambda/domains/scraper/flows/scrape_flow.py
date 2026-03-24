@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-from scraper_lambda.domains.scraper.exceptions import LLMExtractionError
-from scraper_lambda.domains.scraper.models.domain.scraper_result import (
+from monitor_lambda.domains.scraper.exceptions import LLMExtractionError
+from monitor_lambda.domains.scraper.models.domain.scraper_result import (
     ScraperErrorType,
     ScraperFailure,
     ScraperResult,
     ScraperSuccess,
 )
-from scraper_lambda.domains.scraper.flows.classify_response import classify_response
-from scraper_lambda.domains.scraper.flows.extract_name import extract_name
-from scraper_lambda.domains.scraper.flows.extract_price import extract_price
-from scraper_lambda.domains.scraper.flows.fetch_page import fetch_page
-from scraper_lambda.domains.scraper.flows.preprocess_html import preprocess_html
-from scraper_lambda.domains.scraper.ports.llm_client import LLMClient
+from monitor_lambda.domains.scraper.flows.classify_response import classify_response
+from monitor_lambda.domains.scraper.flows.extract_name import extract_name
+from monitor_lambda.domains.scraper.flows.extract_price import extract_price
+from monitor_lambda.domains.scraper.flows.fetch_page import fetch_page
+from monitor_lambda.domains.scraper.flows.preprocess_html import preprocess_html
+from monitor_lambda.domains.scraper.ports.llm_client import LLMClient
 
 
 async def scrape_flow(url: str, *, llm_client: LLMClient) -> ScraperResult:

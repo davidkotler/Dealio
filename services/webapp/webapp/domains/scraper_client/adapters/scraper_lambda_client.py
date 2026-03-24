@@ -17,10 +17,10 @@ _RETRYABLE = {ScraperErrorType.TIMEOUT, ScraperErrorType.HTTP_ERROR}
 
 
 class ScraperLambdaClient:
-    def __init__(self, lambda_name: str, max_retries: int = 3) -> None:
+    def __init__(self, lambda_name: str, region: str, max_retries: int = 3) -> None:
         self._lambda_name = lambda_name
         self._max_retries = max_retries
-        self._client = boto3.client("lambda")
+        self._client = boto3.client("lambda", region_name=region)
 
     async def scrape(self, url: str) -> ScraperResult:
         attempt = 0
