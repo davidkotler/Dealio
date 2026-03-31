@@ -12,4 +12,5 @@ dependencies = [
 members = [
     "services/monitor_lambda",
     "services/webapp",
+    "services/pipeline",
 ]
