@@ -2,6 +2,39 @@
 
 ---
 
+## [2026-04-01 00:02] — /implement — Implementation
+
+- **Task:** T-5 — Email Lambda — Send alert flow + SES adapter + handler
+- **Agents dispatched:** python-implementer (general-purpose)
+- **Skills invoked:** implement-python, implement-event
+- **Artifacts produced:** `pipeline/domains/email/exceptions.py`, `pipeline/domains/email/models/domain/email_alert_payload.py`, `pipeline/domains/email/ports/email_sender_port.py`, `pipeline/domains/email/flows/send_alert_flow.py`, `pipeline/domains/email/adapters/ses_email_sender.py`, `pipeline/domains/email/jobs/handler.py`, all `__init__.py` stubs (7 files)
+- **Outcome:** Task T-5 implemented: `EmailAlertPayload` frozen dataclass, `@runtime_checkable EmailSenderPort`, `send_alert_flow` (structlog with `correlation_id`/`user_id`/`stage="email"`), `SESEmailSenderAdapter` (`asyncio.to_thread`, `EmailDeliveryError from ClientError`), Lambda handler with double-JSON SNS-over-SQS unwrap. Both smoke-import and field assertion verifications pass. No DB access. Task marked complete.
+- **Findings:** None
+
+---
+
+## [2026-04-01 00:01] — /implement — Implementation
+
+- **Task:** T-4 — DB-Update Lambda — Persist flow + conditional write adapter + handler
+- **Agents dispatched:** python-implementer (general-purpose)
+- **Skills invoked:** implement-python, implement-data, implement-event
+- **Artifacts produced:** `pipeline/domains/db_update/models/domain/price_drop_sqs_message.py`, `pipeline/domains/db_update/ports/tracked_product_write_port.py`, `pipeline/domains/db_update/ports/notification_write_port.py`, `pipeline/domains/db_update/ports/price_check_log_write_port.py`, `pipeline/domains/db_update/flows/persist_price_drop_flow.py`, `pipeline/domains/db_update/adapters/sqlalchemy_price_drop_persistence_adapter.py`, `pipeline/domains/db_update/jobs/handler.py`, `pipeline/domains/db_update/exceptions.py`, all `__init__.py` stubs (7 files)
+- **Outcome:** Task T-4 implemented: domain model, 3 `@runtime_checkable` port protocols, `persist_price_drop_flow` with idempotency guard, `SQLAlchemyPriceDropPersistenceAdapter` (conditional UPDATE + 2 INSERTs via `text()`), and Lambda handler with SNS-over-SQS double-JSON unwrap. Smoke import passes. Task marked complete.
+- **Findings:** None
+
+---
+
+## [2026-04-01 00:00] — /implement — Implementation
+
+- **Task:** T-3 — Scraper Lambda — Scrape dispatch flow + SNS adapter + failure log + handler
+- **Agents dispatched:** python-implementer (general-purpose)
+- **Skills invoked:** implement-python, implement-pydantic
+- **Artifacts produced:** `pipeline/domains/scraper/models/domain/scraper_event_payload.py`, `pipeline/domains/scraper/models/domain/price_drop_message.py`, `pipeline/domains/scraper/models/contracts/events/price_drop_sns_message.py`, `pipeline/domains/scraper/ports/sns_publish_port.py`, `pipeline/domains/scraper/ports/price_check_log_write_port.py`, `pipeline/domains/scraper/flows/scrape_dispatch_flow.py`, `pipeline/domains/scraper/adapters/sns_publish_adapter.py`, `pipeline/domains/scraper/adapters/sqlalchemy_failure_log_adapter.py`, `pipeline/domains/scraper/jobs/handler.py`, `pipeline/domains/scraper/exceptions.py`, all `__init__.py` stubs (9 files)
+- **Outcome:** Task T-3 implemented: full Scraper bounded context with domain models, Pydantic SNS contract (`extra="ignore"`), two `@runtime_checkable` ports, `scrape_dispatch_flow` (`match/case` 3-branch dispatch), `SNSPublishAdapter` (`asyncio.to_thread`), `SQLAlchemyFailureLogAdapter` (INSERT + immediate commit), and Lambda handler. Smoke-import and price serialisation checks both pass. Task marked complete.
+- **Findings:** None
+
+---
+
 ## [2026-03-27 00:00] — /discover-requirements — Discovery
 
 - **Task:** N/A

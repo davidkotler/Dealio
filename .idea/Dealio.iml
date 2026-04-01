@@ -5,7 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/services/monitor_lambda" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/lambda_testing/.venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.13 virtualenv at C:\work_projects\Dealio\.venv" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.13 virtualenv at C:\work_projects\Dealio\.venv (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">
